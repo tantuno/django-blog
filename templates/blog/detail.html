@@ -5,5 +5,19 @@
             <p>By <b>{{ post.author }}</b> on <i>{{ post.posted }}</i></p>
             <p>{{ post.content }}</p>
         </div>
+        <div>
+        {% for comment in post.comments.all %}
+            <p>{{ comment.author }} | {{ comment.posted }}</p>
+            <p>{{ comment.text }}</p>
+        {% endfor %}
+        {% if request.user.is_authenticated %}
+        <form action="" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Send</button>
+        </form>
+        {% endif %}
+
+        </div>
         <br/>
 {% endblock %}
