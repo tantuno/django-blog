@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404,redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
 from .models import Post
 from .forms import PostForm, CommentForm
 
@@ -18,7 +18,7 @@ class UserPostListView(ListView):
     template_name = 'blog/list.html'
 
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        user = get_object_or_404(get_user_model(), username=self.kwargs.get('username'))
         return Post.objects.filter(author=user)
 
 
