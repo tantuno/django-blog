@@ -1,7 +1,10 @@
-from django.shortcuts import render, get_object_or_404,redirect
+from django.shortcuts import get_object_or_404,redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
 from .models import Post
 from .forms import PostForm, CommentForm
 
@@ -39,6 +42,20 @@ class PostDetailView(DetailView):
         print(form)
         if form.is_valid():
             form.save()
+
+        email_subject = 'New comment'
+        author = post.author
+        current_site = get_current_site(request)
+        message = render_to_string('users/new_comment_email.html', {
+            'author': author.username,
+            'user': request.user.username,
+            'post': post,
+            'domain': current_site.domain,
+            'comment': form.cleaned_data.get('text'),
+        })
+        to_email = author.email
+        email = EmailMessage(email_subject, message, to=[to_email])
+        email.send()
         return redirect('blog:post-detail', post.pk)
 
     def get_context_data(self, **kwargs):
