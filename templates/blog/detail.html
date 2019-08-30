@@ -3,20 +3,26 @@
     <h1>{{ post.title }}</h1>
         <div class="container">
             <p>By <b><a href="{% url 'blog:author-post-list' post.author.username %}"> {{ post.author }}</a></b> on <i>{{ post.posted }}</i></p>
+            {% if request.user == post.author %}
+
+                <a href="{% url 'blog:post-edit' post.pk %}"><button type="button"> Edit</button></a>
+                <a href="{% url 'blog:post-delete' post.pk %}"><button type="button"> Delete</button></a>
+            {% endif %}
             <p>{{ post.content }}</p>
         </div>
-        <div>
-        {% for comment in post.comments.all %}
-            <p>{{ comment.author }} | {{ comment.posted }}</p>
-            <p>{{ comment.text }}</p>
-        {% endfor %}
-        {% if request.user.is_authenticated %}
-        <form action="" method="POST">
+    {% if request.user.is_authenticated %}
+        <form action="{% url 'blog:comment-create' post.pk %}" method="POST">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Send</button>
         </form>
         {% endif %}
+
+        <div>
+        {% for comment in post.comments.all %}
+            <p>{{ comment.author }} | {{ comment.posted }}</p>
+            <p>{{ comment.text }}</p>
+        {% endfor %}
 
         </div>
         <br/>

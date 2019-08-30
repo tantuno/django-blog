@@ -3,14 +3,16 @@ from django.views import View
 from django.http import HttpResponse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from django.contrib.auth import get_user_model, login, update_session_auth_hash
+from django.contrib.auth.views import LogoutView
+from django.contrib.auth import get_user_model, login, update_session_auth_hash, logout, authenticate
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, LoginForm
 from .models import CustomUser
+from blog.tasks import send_mail_task
 
 
 class SignupView(View):
@@ -36,8 +38,7 @@ class SignupView(View):
                 'token': account_activation_token.make_token(user),
             })
             to_email = form.cleaned_data.get('email')
-            email = EmailMessage(email_subject, message, to=[to_email])
-            email.send()
+            send_mail_task(email_subject, message, to_email)
 
             return HttpResponse('We have sent you an email, please confirm your email address to complete registration')
 
@@ -69,3 +70,27 @@ class ActivateView(View):
             user = form.save()
             update_session_auth_hash(request, user)
             return HttpResponse('Password changed successfully')
+
+
+class LoginView(View):
+    def get(self, request):
+        next = request.GET.get('next')
+        form = LoginForm()
+        return render(request, 'users/login.html', {'form': form})
+
+    def post(self, request):
+        next = request.GET.get('next')
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                if next:
+                    return redirect(next)
+                return redirect('blog:post-list')
+            else:
+                return render(request, 'users/login.html', {'form': form,
+                                                            'error': 'Wrong credentials'})
+        return render(request, 'users/login.html', {'form': form})
