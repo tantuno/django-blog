@@ -1,32 +1,28 @@
-from django.shortcuts import get_object_or_404,redirect
+from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.template.loader import render_to_string
-from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.decorators import method_decorator
-from django.core.mail import EmailMessage
 from django.urls import reverse_lazy
-from .models import Post, Comment
+from .models import Post
 from .forms import PostForm, CommentForm
-from .tasks import send_mail_task, adding_task
+from .tasks import send_mail_task
+
 
 class PostListView(ListView):
     model = Post
     context_object_name = 'posts'
     template_name = 'blog/list.html'
 
-
-class UserPostListView(ListView):
-    model = Post
-    context_object_name = 'posts'
-    template_name = 'blog/list.html'
-
     def get_queryset(self):
-        user = get_object_or_404(get_user_model(), username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user)
+        queryset = super(PostListView, self).get_queryset()
+        author_name = self.request.GET.get('author_id')
+        if author_name:
+            queryset = queryset.filter(author__username=author_name)
+        return queryset
 
 
 class PostDetailView(DetailView):
@@ -52,9 +48,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 class PostEditView(LoginRequiredMixin, UpdateView):
     model = Post
     form_class = PostForm
-
-    def form_valid(self, form):
-        return super().form_valid(form)
 
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
@@ -86,6 +79,4 @@ class CommentCreateView(View):
 
                 to_email = author.email
                 send_mail_task.delay(email_subject, message, to_email)
-                # email = EmailMessage(email_subject, message, to=[to_email])
-                # email.send()
             return redirect('blog:post-detail', post.pk)

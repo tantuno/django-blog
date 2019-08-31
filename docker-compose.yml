@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: vakoms_test_blog
+      MYSQL_ROOT_PASSWORD: password
+      DB_USER: root
+      DB_PASSWORD: password
+    networks: [test-blog]
+
+  redis:
+    image: redis:5.0.5
+    hostname: redis
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: .
+    command: celery -A dev worker -l info
+    volumes:
+      - .:/code
+    links:
+      - redis
+    depends_on:
+      - db
+      - redis
+
+  celery-beat:
+    build: .
+    command: celery -A dev beat -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - redis
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+      - celery
+    networks: [test-blog]
+
+
+networks:
+  test-blog:
+    driver: bridge

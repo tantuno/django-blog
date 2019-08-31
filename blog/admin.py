@@ -11,5 +11,6 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ['author', 'posted', 'text']
     list_filter = ['posted', 'author', 'post']
 
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)
