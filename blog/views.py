@@ -1,4 +1,4 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.template.loader import render_to_string
@@ -61,22 +61,25 @@ class CommentCreateView(View):
     def post(self, request, pk):
         form = CommentForm(request.POST)
         if form.is_valid():
-            post = Post.objects.get(pk=pk)
+            post = get_object_or_404(Post, pk=pk)
             form.instance.post = post
             form.instance.author = request.user
             form.save()
             if request.user != post.author:
-                email_subject = 'New comment'
-                author = post.author
-                current_site = get_current_site(request)
-                message = render_to_string('users/new_comment_email.html', {
-                    'author': author.username,
-                    'user': request.user.username,
-                    'post': post,
-                    'domain': current_site.domain,
-                    'comment': form.cleaned_data.get('text'),
-                })
+                message = render_to_string(
+                    'users/new_comment_email.html',
+                    {
+                        'author': post.author.username,
+                        'user': request.user.username,
+                        'post': post,
+                        'domain': get_current_site(request).domain,
+                        'comment': form.cleaned_data.get('text'),
+                    }
+                )
 
-                to_email = author.email
-                send_mail_task.delay(email_subject, message, to_email)
+                send_mail_task.delay(
+                    subject='New comment',
+                    message=message,
+                    to_email=post.author.email
+                )
             return redirect('blog:post-detail', post.pk)
