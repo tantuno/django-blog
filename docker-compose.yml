@@ -48,6 +48,10 @@ services:
       - .:/code
     ports:
       - "8000:8000"
+    environment:
+      DB_NAME: vakoms_test_blog
+      DB_USER: root
+      DB_PASS: 123
     depends_on:
       - db
       - redis

@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Posts</h1>
+    <h1>{% if author %}{{ author }}'s post{{ posts|pluralize }}{% else %}Posts{% endif %}</h1>
     {% for post in posts %}
-        <div class="container">
+        <hr/>
+        <div class="container border border-light">
             <h2><a href="{{ post.get_absolute_url }}"> {{ post.title }}</a></h2>
-            <p>By <b><a href="{% url 'blog:post-list' %}?author={{ post.author }}"> {{ post.author }}</a></b> on <i>{{ post.posted }}</i></p>
-            <p>{{ post.content }}</p>
+            <p>By <b><a href="{% url 'blog:post-list' %}?author={{ post.author }}"> {{ post.author }}</a></b>
+                on <i>{{ post.posted|date:'Y-m-d H:i' }}</i></p>
         </div>
         <br/>
     {% empty %}

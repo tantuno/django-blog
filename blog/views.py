@@ -19,10 +19,17 @@ class PostListView(ListView):
 
     def get_queryset(self):
         queryset = super(PostListView, self).get_queryset()
-        author_name = self.request.GET.get('author_id')
+        author_name = self.request.GET.get('author')
         if author_name:
             queryset = queryset.filter(author__username=author_name)
         return queryset
+
+    def get_context_data(self, **kwargs):
+        author_name = self.request.GET.get('author')
+        context = super().get_context_data(**kwargs)
+        if author_name:
+            context['author'] = author_name
+        return context
 
 
 class PostDetailView(DetailView):
@@ -76,7 +83,6 @@ class CommentCreateView(View):
                         'comment': form.cleaned_data.get('text'),
                     }
                 )
-
                 send_mail_task.delay(
                     subject='New comment',
                     message=message,

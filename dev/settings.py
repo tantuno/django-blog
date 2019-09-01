@@ -22,7 +22,7 @@ DEBUG = False
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -69,13 +69,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dev.wsgi.application'
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vakoms_test_blog',
-        'USER': 'root',
-        'PASSWORD': '123',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASS'),
         'HOST': 'db',
         'PORT': '3306',
     }

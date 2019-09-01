@@ -1,27 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Title</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-</head>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>{% block title %}{% endblock %}Test Blog</title>
+
+  </head>
 <body>
-<header class="container">
-    <p class="h4"><a href="{% url 'blog:post-list' %}"> Home</a>
-        {% if request.user.is_authenticated %}
-            <a href="{% url 'account:logout' %}">Logout</a>
-        {% else %}
-            <a href="{% url 'account:login' %}">Login</a>
-        {% endif %}
-    </p>
-</header>
-<div class="container">
-    {% block content %}
-    {% endblock %}
+<header class="container navbar-light" style="background-color: #c6e1fd;">
+<div class="row ">
+<div class="col">
+<ul class="nav">
+  <li class="nav-item">
+    <a class="navbar-brand" href="{% url 'blog:post-list' %}">Test Blog</a>
+  </li>
+    {% if request.user.is_authenticated and author %}
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'blog:post-create' %}">New post</a>
+  </li>
+    {% endif %}
+</ul>
 </div>
+<div class="col">
+<ul class="nav justify-content-end">
+    {% if request.user.is_authenticated %}
+        <li class="nav-item">
+    <a class="nav-link" href="{% url 'blog:post-list' %}?author={{ request.user.username }}">{{ request.user.username }}</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="{% url 'account:logout' %}">Logout</a>
+  </li>
+    {% else %}
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'account:login' %}">Login</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'account:signup' %}">Register</a>
+  </li>
+    {% endif %}
+</ul>
+</div>
+</div>
+</header>
+<main role="main" class="container">
+<div class="row">
+    <div class="container" style="margin-top: 20px;">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+</main>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

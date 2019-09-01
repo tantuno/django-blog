@@ -1,5 +1,17 @@
-Hi {{ author }},
-    You have new comment<br/>
-    <a href="href://{{ domain }}{{ post.get_absolute_url }}">{{ post.title }}</a><br/>
-    from <b>{{ user }}</b>
-    {{ comment }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mail</title>
+</head>
+<body>
+    <div>
+        Hi {{ author }},
+        You have new comment from <b>{{ user }}</b><br/>
+        <a href="http://{{ domain }}{{ post.get_absolute_url }}">{{ post.title }}</a><br/>
+        {{ comment }}
+    </div>
+</body>
+</html>
+
+

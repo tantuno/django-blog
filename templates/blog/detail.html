@@ -1,29 +1,28 @@
 {% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - {% endblock %}
+
 {% block content %}
     <h1>{{ post.title }}</h1>
-        <div class="container">
-            <p>By <b><a href="{% url 'blog:post-list' %}?author={{ post.author }}"> {{ post.author }}</a></b> on <i>{{ post.posted }}</i></p>
-            {% if request.user == post.author %}
-
-                <a href="{% url 'blog:post-edit' post.pk %}"><button type="button"> Edit</button></a>
-                <a href="{% url 'blog:post-delete' post.pk %}"><button type="button"> Delete</button></a>
-            {% endif %}
-            <p>{{ post.content }}</p>
-        </div>
+    <div class="container">
+        <p>By <b><a href="{% url 'blog:post-list' %}?author={{ post.author }}"> {{ post.author }}</a></b> on <i>{{ post.posted }}</i></p>
+        {% if request.user == post.author %}
+            <button type="button" class="btn btn-info" onclick="window.location='{% url 'blog:post-edit' post.pk %}';return false;">Edit</button>
+            <button type="button" class="btn btn-info" onclick="window.location='{% url 'blog:post-delete' post.pk %}';return false;">Delete</button>
+        {% endif %}
+        <p>{{ post.content }}</p>
+    </div>
     {% if request.user.is_authenticated %}
         <form action="{% url 'blog:comment-create' post.pk %}" method="POST">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Send</button>
+            <button type="submit" class="btn btn-info">Send</button>
         </form>
-        {% endif %}
-
-        <div>
+    {% endif %}
+    <div>
         {% for comment in post.comments.all %}
             <p>{{ comment.author }} | {{ comment.posted }}</p>
             <p>{{ comment.text }}</p>
         {% endfor %}
-
-        </div>
-        <br/>
+    </div>
 {% endblock %}

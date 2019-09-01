@@ -1,13 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    Are you sure you want to delete the post?
     <form action="" method="post">
-    Are you sure?
-    {% csrf_token %}
-    {{ form.as_p }}
+        {% csrf_token %}
+        {{ form.as_p }}
         <br/>
-    <button type="submit" value="Delete">Delete</button>
-
+         <button type="submit" class="btn btn-info">Confirm</button>
+        <button type="button" onclick="window.history.back();" class="btn btn-info">Cancel</button>
     </form>
-<a href="{% url 'blog:post-list' %}" ><button>Cancel</button></a>
 {% endblock %}

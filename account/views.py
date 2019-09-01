@@ -17,10 +17,13 @@ User = get_user_model()
 class SignupView(View):
     form_class = UserCreationForm
 
-    def get(self, request, *args, **kwargs):
-        return render(request, 'account/signup.html', {'form': self.form_class})
+    def get(self, request):
+        if request.user.is_anonymous:
+            return render(request, 'account/signup.html', {'form': self.form_class})
+        else:
+            return redirect('blog:post-list')
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
@@ -64,11 +67,14 @@ class ActivateView(View):
 class LoginView(View):
     form_class = LoginForm
 
-    def get(self, request, *args, **kwargs):
-        form = self.form_class()
-        return render(request, 'account/login.html', {'form': form})
+    def get(self, request):
+        if request.user.is_anonymous:
+            form = self.form_class()
+            return render(request, 'account/login.html', {'form': form})
+        else:
+            return redirect('blog:post-list')
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         next_url = request.GET.get('next')
         form = self.form_class(request.POST)
 
