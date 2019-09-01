@@ -67,7 +67,7 @@ class CommentCreateView(View):
             form.save()
             if request.user != post.author:
                 message = render_to_string(
-                    'users/new_comment_email.html',
+                    'account/new_comment_email.html',
                     {
                         'author': post.author.username,
                         'user': request.user.username,

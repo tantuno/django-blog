@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model, login, authenticate
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
-from .forms import CustomUserCreationForm, LoginForm
+from .forms import UserCreationForm, LoginForm
 from blog.tasks import send_mail_task
 
 
@@ -15,10 +15,10 @@ User = get_user_model()
 
 
 class SignupView(View):
-    form_class = CustomUserCreationForm
+    form_class = UserCreationForm
 
     def get(self, request, *args, **kwargs):
-        return render(request, 'users/signup.html', {'form': self.form_class})
+        return render(request, 'account/signup.html', {'form': self.form_class})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -28,18 +28,18 @@ class SignupView(View):
             user.save()
 
             email_subject = 'Activate your account'
-            message = render_to_string('users/email.html', {
+            message = render_to_string('account/email.html', {
                 'user': user,
                 'domain': get_current_site(request).domain,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': account_activation_token.make_token(user),
             })
-            send_mail_task(email_subject,
+            send_mail_task.delay(email_subject,
                            message,
                            form.cleaned_data.get('email'))
 
             return HttpResponse('We have sent you an email, please confirm your email address to complete registration')
-        return render(request, 'users/signup.html', {'form': form})
+        return render(request, 'account/signup.html', {'form': form})
 
 
 class ActivateView(View):
@@ -66,7 +66,7 @@ class LoginView(View):
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
-        return render(request, 'users/login.html', {'form': form})
+        return render(request, 'account/login.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
         next_url = request.GET.get('next')
@@ -84,6 +84,6 @@ class LoginView(View):
                 return redirect('blog:post-list')
             else:
                 return render(request,
-                              'users/login.html',
+                              'account/login.html',
                               {'form': form, 'error': 'Wrong credentials'})
-        return render(request, 'users/login.html', {'form': form})
+        return render(request, 'account/login.html', {'form': form})

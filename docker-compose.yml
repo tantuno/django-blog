@@ -2,14 +2,16 @@ version: '3'
 
 services:
   db:
-    image: mysql:8.0
+    image: mysql:8.0.2
     command: --default-authentication-plugin=mysql_native_password
     restart: always
+    ports:
+      - "3306:3306"
     environment:
-      MYSQL_DATABASE: db
-      MYSQL_ROOT_PASSWORD: password
-    volumes:
-      - ./mysql/init:/docker-entrypoint-initdb.d/:ro
+      MYSQL_DATABASE: vakoms_test_blog
+      MYSQL_ROOT_PASSWORD: 123
+#    volumes:
+#      - ./mysql/init:/docker-entrypoint-initdb.d/:ro
     networks: [test-blog]
 
   redis:
@@ -17,6 +19,7 @@ services:
     hostname: redis
     ports:
       - "6379:6379"
+    networks: [test-blog]
 
   celery:
     build: .
@@ -28,6 +31,7 @@ services:
     depends_on:
       - db
       - redis
+    networks: [test-blog]
 
   celery-beat:
     build: .
@@ -37,6 +41,7 @@ services:
     depends_on:
       - db
       - redis
+    networks: [test-blog]
 
   web:
     build: .
@@ -49,6 +54,7 @@ services:
       - db
       - redis
       - celery
+      - celery-beat
     networks: [test-blog]
 
 

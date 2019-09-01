@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
 
-class CustomUser(AbstractUser):
+class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     email_confirmed = models.BooleanField(default=False)
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',

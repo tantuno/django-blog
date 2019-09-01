@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users',
+    'account',
     'blog',
 ]
 
@@ -73,9 +73,9 @@ WSGI_APPLICATION = 'dev.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE'),
-        'USER': 'blog_user',
-        'PASSWORD': 'password',
+        'NAME': 'vakoms_test_blog',
+        'USER': 'root',
+        'PASSWORD': '123',
         'HOST': 'db',
         'PORT': '3306',
     }
@@ -121,7 +121,7 @@ STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = 'blog:post-list'
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'account.User'
 
 
 BROKER_TRANSPORT = "redis"
