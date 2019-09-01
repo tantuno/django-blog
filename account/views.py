@@ -20,8 +20,7 @@ class SignupView(View):
     def get(self, request):
         if request.user.is_anonymous:
             return render(request, 'account/signup.html', {'form': self.form_class})
-        else:
-            return redirect('blog:post-list')
+        return redirect('blog:post-list')
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -60,8 +59,7 @@ class ActivateView(View):
             user.save()
             login(request, user)
             return redirect('blog:post-list')
-        else:
-            return HttpResponse('Activation link is invalid!')
+        return HttpResponse('Activation link is invalid!')
 
 
 class LoginView(View):
@@ -71,8 +69,7 @@ class LoginView(View):
         if request.user.is_anonymous:
             form = self.form_class()
             return render(request, 'account/login.html', {'form': form})
-        else:
-            return redirect('blog:post-list')
+        return redirect('blog:post-list')
 
     def post(self, request):
         next_url = request.GET.get('next')
