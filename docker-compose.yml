@@ -10,8 +10,6 @@ services:
     environment:
       MYSQL_DATABASE: vakoms_test_blog
       MYSQL_ROOT_PASSWORD: 123
-#    volumes:
-#      - ./mysql/init:/docker-entrypoint-initdb.d/:ro
     networks: [test-blog]
 
   redis:
