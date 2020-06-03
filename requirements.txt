@@ -3,7 +3,7 @@ billiard==3.6.1.0
 celery==4.3.0
 Django==2.2.4
 importlib-metadata==0.19
-kombu==4.6.4
+kombu==4.6.10
 more-itertools==7.2.0
 mysqlclient==1.4.4
 pytz==2019.2
